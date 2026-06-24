@@ -439,12 +439,13 @@ including the Computer Fraud and Abuse Act (CFAA)
 If you reference this research, please cite:
 
 ```bibtex
-@misc{wth_poc_2025,
-  title={Waiting Thread Hijacking - Proof of Concept},
-  author={Security Researcher},
-  year={2025},
-  howpublished={\url{https://github.com/yourusername/waiting-thread-hijacking}},
-  note={Based on hasherezade's research at Check Point Research}
+@article{pour2026wth,
+  author = {Mohammad Ali Pour and Fazel},
+  title = {Waiting Thread Hijacking (WTH): Mechanism, Technical Analysis, Detection Opportunities, and Purple Team Considerations},
+  year = {2026},
+  journal = {SSRN Electronic Journal},
+  note = {Available at SSRN},
+  url = {https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6989659}
 }
 ```
 
@@ -467,5 +468,5 @@ If you reference this research, please cite:
 ---
 
 **Last Updated:** June 2026
-**Status:** Production-Ready for Lab Testing
+
 **Disclaimer:** See DISCLAIMER.md for full legal information
