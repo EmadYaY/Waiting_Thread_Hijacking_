@@ -139,7 +139,7 @@ Stack base at: TEB + 0x08
    ├─ 4: DelayExecution                      │
    ├─ 5: Suspended                           │
    ├─ 6: UserRequest                         │
-   ├─ 7: WrQueue      ◄── IDEAL FOR WTH     │
+   ├─ 7: WrQueue      ◄── IDEAL FOR WTH      │
    ├─ 8: LpcReceive                          │
    ├─ 9: LpcReply                            │
    └─ 10+: Various other reasons             │
@@ -164,18 +164,18 @@ Stack base at: TEB + 0x08
 │ NtQuerySystemInformation(SystemProcessInformation)      │
 │                                                         │
 │ Returns: Linked list of all processes                   │
-│   ├─ Each SYSTEM_PROCESS_INFORMATION contains:         │
+│   ├─ Each SYSTEM_PROCESS_INFORMATION contains:          │
 │   │  ├─ Process ID                                      │
 │   │  ├─ Number of threads                               │
-│   │  └─ Array of SYSTEM_THREAD_INFORMATION             │
+│   │  └─ Array of SYSTEM_THREAD_INFORMATION              │
 │   │     ├─ Thread ID                                    │
 │   │     ├─ ThreadState (5 = Waiting)                    │
 │   │     ├─ WaitReason (7 = WrQueue)                     │
-│   │     └─ ClientId                                      │
+│   │     └─ ClientId                                     │
 │   │                                                     │
-│   └─ Loop until found suitable thread                    │
+│   └─ Loop until found suitable thread                   │
 │                                                         │
-│ Criteria: ThreadState == 5 AND WaitReason == 7         │
+│ Criteria: ThreadState == 5 AND WaitReason == 7          │
 └─────────────────────────────────────────────────────────┘
 
 Time Complexity: O(n) where n = number of threads
@@ -196,14 +196,14 @@ Space: 128KB - 32MB (dynamic buffer allocation)
            │
            ▼
 ┌────────────────────────────────────────────────┐
-│ GetThreadContext(hThread, &ctx)               │
+│ GetThreadContext(hThread, &ctx)                │
 │                                                │
 │ Returns: CPU context snapshot                  │
-│  ├─ RIP (Instruction Pointer)                 │
-│  ├─ RSP (Stack Pointer)                       │
-│  ├─ All general purpose registers             │
-│  ├─ All extended registers (R8-R15)           │
-│  └─ RFLAGS (CPU flags)                        │
+│  ├─ RIP (Instruction Pointer)                  │
+│  ├─ RSP (Stack Pointer)                        │
+│  ├─ All general purpose registers              │
+│  ├─ All extended registers (R8-R15)            │
+│  └─ RFLAGS (CPU flags)                         │
 │                                                │
 │ Key Field for WTH: RSP                         │
 │  RSP points to stack location [RSP]            │
@@ -249,8 +249,8 @@ Local Memory (Attacker Process):
 │  0x00: pushfq                            │
 │  0x01-0x37: Register preservation        │
 │  0x38: popfq                             │
-│  0x39-0x3A: mov rax, imm64 (opcode)     │
-│  0x3B-0x42: [PLACEHOLDER for address]   │ ← ORIGINAL_RET_OFFSET
+│  0x39-0x3A: mov rax, imm64 (opcode)      │
+│  0x3B-0x42: [PLACEHOLDER for address]    │ ← ORIGINAL_RET_OFFSET
 │  0x43-0x44: jmp rax                      │
 └──────────────────────────────────────────┘
            │
@@ -275,10 +275,10 @@ Target Process Memory:
 ├──────────────────────────────────────────┤
 │ 0x7ff8a3000000:  Other system DLLs       │
 ├──────────────────────────────────────────┤
-│ 0x1a2b0000:      ┌─────────────────┐    │ ← VirtualAllocEx
-│                  │ wth_shellcode   │    │   Allocated here
-│                  │ (69 bytes, RWX) │    │   PAGE_READWRITE
-│                  └─────────────────┘    │   then PAGE_EXECUTE_READ
+│ 0x1a2b0000:      ┌─────────────────┐     │ ← VirtualAllocEx
+│                  │ wth_shellcode   │     │   Allocated here
+│                  │ (69 bytes, RWX) │     │   PAGE_READWRITE
+│                  └─────────────────┘     │   then PAGE_EXECUTE_READ
 ├──────────────────────────────────────────┤
 │ 0x7fff0000:      Target stack            │
 │  [RSP]: Original RET address → HIJACKED  │
@@ -373,7 +373,7 @@ After Hijacking:
 ┌─────────────────────────────────────────┐
 │ Address       Contents                  │
 ├─────────────────────────────────────────┤
-│ [RSP + 0x00]  HIJACKED → 0x1a2b0000    │ ← shellcode address
+│ [RSP + 0x00]  HIJACKED → 0x1a2b0000     │ ← shellcode address
 │ [RSP + 0x08]  Caller frame (unchanged)  │
 │ [RSP + 0x10]  Local variables...        │
 │ [RSP + 0x18]  ...                       │
@@ -383,13 +383,13 @@ After Hijacking:
 
 Return Address Resolution:
 ┌────────────────────────────────┐
-│ x64 RET instruction flow:       │
+│ x64 RET instruction flow:      │
 ├────────────────────────────────┤
 │ 1. pop rax ; rax = [RSP]       │
 │ 2. add rsp, 0x8                │
-│ 3. jmp rax                      │
+│ 3. jmp rax                     │
 │                                │
-│ In WTH case:                    │
+│ In WTH case:                   │
 │ 1. pop rax ; rax = 0x1a2b0000  │
 │ 2. add rsp, 0x8                │
 │ 3. jmp 0x1a2b0000 (shellcode)  │
